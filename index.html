@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OficiosSV | Strategic Project Dashboard</title>
+    <title>OficiosSV | Plan de Marketing & Go-To-Market</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,902 +11,429 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Font Awesome (for icons, using CDN as requested alternatives like Unicodes/Canvas are also used, but FA is reliable for standard UI icons if needed, though instructions say avoid SVG. I will use Unicode and CSS shapes primarily, but loading a font for icons is standard. I will stick to Unicode for strict compliance with 'No SVG' instructions in the prompt's graphics section, or use text-based icons.) -->
-    <!-- Actually, prompt allows "Unicode characters/icons". I will use Unicodes. -->
-
     <style>
-        /* Custom Styles for Chart Containers */
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
             height: 300px;
             max-height: 400px;
         }
         @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
+            .chart-container { height: 350px; }
         }
-
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Utility for hiding/showing */
-        .hidden-content {
-            display: none;
-        }
+        html { scroll-behavior: smooth; }
+        .hidden-content { display: none; }
+        .hover-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
-        /* Card Hover Effects */
-        .hover-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Custom ranges for calculator */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
         }
-        .hover-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-
-        /* Calendar Grid Styles */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.5rem;
-        }
-        .time-slot {
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #2563eb;
             cursor: pointer;
-            transition: all 0.2s;
+            margin-top: -6px;
         }
-        .time-slot:hover {
-            transform: scale(1.05);
-        }
-        .time-slot.selected {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #2563eb;
-        }
-        .time-slot.blocked {
-            background-color: #e2e8f0;
-            color: #94a3b8;
-            cursor: not-allowed;
-            text-decoration: line-through;
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
         }
     </style>
-    <!-- Chosen Palette: Warm Neutrals & Trust Blue -->
-    <!-- Background: #f8fafc (Slate 50) -->
-    <!-- Primary: #0f172a (Slate 900) - Text -->
-    <!-- Accent: #3b82f6 (Blue 500) - Actions/Trust -->
-    <!-- Secondary: #f97316 (Orange 500) - Highlights/Construction vibe -->
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
-
-    <!-- Application Structure Plan:
-         1. Header: Branding and Navigation.
-         2. Hero: Mission Statement and core Value Proposition.
-         3. The "Pain & Gain" Section: Interactive comparison of Current Problem vs. OficiosSV Solution.
-         4. Target Audience: Flip/Toggle cards for Clients vs. Providers.
-         5. The Product (Core UVP): An interactive "Mock" of the Calendar to demonstrate the "No Calls" concept.
-         6. Roadmap: Timeline visualization of Phases 1-3.
-         7. Strategy & Analysis: Interactive SWOT Matrix.
-         8. Business Model Simulator: Inputs for Ticket Size/Commission to visualize Revenue (Chart.js).
-         9. Footer: Contact & Legal summary.
-         
-         WHY: This structure moves from the "Why" (Mission) to the "Who" (Audience), then the "How" (Product Demo), and finally the "Business Viability" (Financials/Strategy), mirroring an Investor Pitch flow.
-    -->
 
     <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-2">
-                    <span class="text-3xl text-blue-600">🛠️</span>
-                    <span class="font-bold text-xl tracking-tight text-slate-900">OficiosSV</span>
+                    <span class="text-3xl text-blue-600">📢</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">OficiosSV <span class="text-slate-400 font-normal">| Marketing</span></span>
                 </div>
                 <div class="hidden md:flex space-x-8">
-                    <a href="#mission" class="text-slate-600 hover:text-blue-600 font-medium transition">Misión</a>
-                    <a href="#audience" class="text-slate-600 hover:text-blue-600 font-medium transition">Usuarios</a>
-                    <a href="#product-demo" class="text-slate-600 hover:text-blue-600 font-medium transition">Producto (Demo)</a>
-                    <a href="#strategy" class="text-slate-600 hover:text-blue-600 font-medium transition">Estrategia</a>
-                    <a href="#business-model" class="text-slate-600 hover:text-blue-600 font-medium transition">Modelo de Negocio</a>
+                    <a href="#estrategia" class="text-slate-600 hover:text-blue-600 font-medium transition">Estrategia</a>
+                    <a href="#marca" class="text-slate-600 hover:text-blue-600 font-medium transition">Marca & Mensaje</a>
+                    <a href="#go-to-market" class="text-slate-600 hover:text-blue-600 font-medium transition">Go-To-Market</a>
+                    <a href="#funnel" class="text-slate-600 hover:text-blue-600 font-medium transition">Simulador CAC</a>
                 </div>
-                <!-- Mobile Menu Button (Simplified for SPA) -->
-                <button id="mobile-menu-btn" class="md:hidden text-2xl">☰</button>
             </div>
-        </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 p-4 space-y-3 shadow-lg">
-            <a href="#mission" class="block text-slate-600">Misión</a>
-            <a href="#audience" class="block text-slate-600">Usuarios</a>
-            <a href="#product-demo" class="block text-slate-600">Producto</a>
-            <a href="#strategy" class="block text-slate-600">Estrategia</a>
-            <a href="#business-model" class="block text-slate-600">Negocio</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header id="mission" class="bg-white pt-16 pb-12 lg:pt-24 lg:pb-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm border border-blue-100">
-                Documento Maestro de Proyecto
+    <header class="bg-slate-900 text-white pt-16 pb-20 lg:pt-24 lg:pb-24 overflow-hidden relative">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#3b82f6 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-500/20 text-blue-300 font-semibold text-sm border border-blue-500/30">
+                Plan de Crecimiento y Adquisición
             </div>
-            <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
-                Dignificando el Oficio en <span class="text-blue-600">El Salvador</span>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+                Resolviendo el Dilema del <br><span class="text-blue-400">Huevo y la Gallina</span>
             </h1>
-            <p class="max-w-2xl mx-auto text-xl text-slate-600 mb-10 leading-relaxed">
-                Conectando trabajadores talentosos con necesidades inmediatas mediante tecnología real-time. Sin llamadas. Sin incertidumbre.
+            <p class="max-w-2xl mx-auto text-xl text-slate-300 mb-10 leading-relaxed">
+                Cómo vamos a reclutar a los mejores profesionales empíricos y conectarlos con clientes digitales en zonas urbanas clave de El Salvador.
             </p>
-            
-            <!-- Quick Stats/KPIs -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-12">
-                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 hover-card">
-                    <div class="text-3xl mb-1">⚡</div>
-                    <div class="font-bold text-slate-800">Inmediatez</div>
-                    <div class="text-xs text-slate-500">Core Value</div>
-                </div>
-                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 hover-card">
-                    <div class="text-3xl mb-1">🛡️</div>
-                    <div class="font-bold text-slate-800">Seguridad</div>
-                    <div class="text-xs text-slate-500">Verificación DUI</div>
-                </div>
-                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 hover-card">
-                    <div class="text-3xl mb-1">📅</div>
-                    <div class="font-bold text-slate-800">Calendario</div>
-                    <div class="text-xs text-slate-500">Tiempo Real</div>
-                </div>
-                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 hover-card">
-                    <div class="text-3xl mb-1">📈</div>
-                    <div class="font-bold text-slate-800">Dignidad</div>
-                    <div class="text-xs text-slate-500">Pago Justo</div>
-                </div>
-            </div>
         </div>
     </header>
 
-    <main class="space-y-24 pb-24">
+    <main class="space-y-24 pb-24 mt-[-40px] relative z-20">
 
-        <!-- Section 1: Problem vs Solution (Comparativa) -->
-        <section id="problem-solution" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900 mb-4">El Problema vs. La Solución</h2>
-                <p class="text-slate-600 max-w-3xl mx-auto">
-                    Analizando la fricción actual del mercado informal y cómo OficiosSV elimina las barreras de entrada para clientes y oferentes.
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 items-stretch">
-                <!-- The Old Way -->
-                <div class="bg-red-50 rounded-2xl p-8 border border-red-100 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 bg-red-200 text-red-800 px-3 py-1 text-xs font-bold rounded-bl-lg">ACTUALIDAD</div>
-                    <h3 class="text-xl font-bold text-red-800 mb-4 flex items-center gap-2">
-                        <span>❌</span> El Proceso Tradicional
-                    </h3>
-                    <ul class="space-y-4 text-red-900/80">
-                        <li class="flex items-start gap-3">
-                            <span class="mt-1 text-red-500">●</span>
-                            <span><strong>Incertidumbre:</strong> "¿Será confiable? ¿Me robará?" Dependencia ciega del boca a boca.</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="mt-1 text-red-500">●</span>
-                            <span><strong>Fricción:</strong> Llamadas tediosas, espera de confirmación, regateo incómodo.</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="mt-1 text-red-500">●</span>
-                            <span><strong>Informalidad:</strong> Sin garantías, sin facturas, sin historial de servicio.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- The OficiosSV Way -->
-                <div class="bg-blue-50 rounded-2xl p-8 border border-blue-100 relative overflow-hidden hover-card">
-                    <div class="absolute top-0 right-0 bg-blue-200 text-blue-800 px-3 py-1 text-xs font-bold rounded-bl-lg">FUTURO</div>
-                    <h3 class="text-xl font-bold text-blue-800 mb-4 flex items-center gap-2">
-                        <span>✅</span> La Solución OficiosSV
-                    </h3>
-                    <ul class="space-y-4 text-blue-900/80">
-                        <li class="flex items-start gap-3">
-                            <span class="mt-1 text-blue-500">●</span>
-                            <span><strong>Confianza Verificada:</strong> Perfiles validados con DUI y reseñas obligatorias.</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="mt-1 text-blue-500">●</span>
-                            <span><strong>Inmediatez Real:</strong> Calendario interactivo. Si está libre, lo reservas. Sin llamadas.</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="mt-1 text-blue-500">●</span>
-                            <span><strong>Garantía:</strong> Soporte de plataforma y pagos seguros (si se usa la app).</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Target Audience (Interactive Tabs) -->
-        <section id="audience" class="bg-white py-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section 1: Estrategia de Adquisición (El Huevo y la Gallina) -->
+        <section id="estrategia" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
                 <div class="text-center mb-10">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Nuestros Usuarios</h2>
-                    <p class="text-slate-600">Un marketplace de dos vías diseñado para resolver dolores específicos.</p>
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Estrategia Dual de Adquisición</h2>
+                    <p class="text-slate-600">Un marketplace necesita liquidez. No podemos lanzar pauta a clientes si la app está vacía de oferentes.</p>
                 </div>
 
-                <!-- Tab Controls -->
-                <div class="flex justify-center mb-8">
-                    <div class="bg-slate-100 p-1 rounded-lg inline-flex">
-                        <button onclick="switchAudience('client')" id="btn-client" class="px-6 py-2 rounded-md text-sm font-medium transition bg-white text-slate-900 shadow-sm">
-                            El Cliente (Demanda)
-                        </button>
-                        <button onclick="switchAudience('provider')" id="btn-provider" class="px-6 py-2 rounded-md text-sm font-medium transition text-slate-500 hover:text-slate-900">
-                            El Oferente (Oferta)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Content Area -->
-                <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-8 min-h-[300px] transition-all" id="audience-content">
-                    <!-- Client Content (Default) -->
-                    <div id="content-client" class="animate-fadeIn">
-                        <div class="flex flex-col md:flex-row gap-8 items-center">
-                            <div class="w-full md:w-1/3 text-center">
-                                <div class="text-6xl mb-4">📱</div>
-                                <h3 class="text-2xl font-bold text-slate-900">Digital First</h3>
-                                <p class="text-sm text-slate-500">25 - 45 Años | Zona Urbana</p>
-                            </div>
-                            <div class="w-full md:w-2/3 space-y-4 border-l border-slate-100 pl-0 md:pl-8">
-                                <h4 class="font-bold text-lg text-blue-600">Perfil Psicográfico</h4>
-                                <p class="text-slate-600 italic">"Valoro mi tiempo más que el dinero. No quiero regatear ni llamar a 5 personas para ver quién puede."</p>
-                                <ul class="space-y-2 text-slate-700 mt-4">
-                                    <li>🔹 Acostumbrados a servicios On-Demand (Uber, PedidosYa).</li>
-                                    <li>🔹 Buscan solución <strong>sin fricción</strong>.</li>
-                                    <li>🔹 Dispuestos a pagar por seguridad y conveniencia.</li>
-                                </ul>
-                            </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Supply Side (Oferta) -->
+                    <div class="bg-orange-50 rounded-xl p-6 border border-orange-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-4xl">🛠️</span>
+                            <h3 class="text-2xl font-bold text-orange-800">1. La Oferta (Proveedores)</h3>
                         </div>
-                    </div>
-                    
-                    <!-- Provider Content (Hidden) -->
-                    <div id="content-provider" class="hidden-content animate-fadeIn">
-                        <div class="flex flex-col md:flex-row gap-8 items-center">
-                            <div class="w-full md:w-1/3 text-center">
-                                <div class="text-6xl mb-4">🛠️</div>
-                                <h3 class="text-2xl font-bold text-slate-900">Experto de Oficio</h3>
-                                <p class="text-sm text-slate-500">Técnico o Empírico | Busca Ingresos</p>
-                            </div>
-                            <div class="w-full md:w-2/3 space-y-4 border-l border-slate-100 pl-0 md:pl-8">
-                                <h4 class="font-bold text-lg text-orange-600">Perfil Psicográfico</h4>
-                                <p class="text-slate-600 italic">"Tengo días muertos en la semana donde no gano nada. Necesito llenar mi agenda y que me paguen lo justo."</p>
-                                <ul class="space-y-2 text-slate-700 mt-4">
-                                    <li>🔸 Graduados técnicos (ITCA) o expertos por experiencia.</li>
-                                    <li>🔸 Dependen actualmente del "boca a boca" limitado.</li>
-                                    <li>🔸 Buscan <strong>dignificación</strong> y exposición masiva.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Product MVP & Interactive Calendar Demo -->
-        <section id="product-demo" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-2 gap-12">
-                <!-- Left: MVP Definition -->
-                <div>
-                    <h2 class="text-3xl font-bold text-slate-900 mb-6">El Producto (MVP)</h2>
-                    <p class="text-slate-600 mb-8">La Versión 1.0 se centra exclusivamente en la funcionalidad core para validar el mercado. Menos es más.</p>
-                    
-                    <div class="space-y-6">
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">1</div>
-                            <div>
-                                <h4 class="font-bold text-slate-900">Calendario Bidireccional</h4>
-                                <p class="text-sm text-slate-600">El corazón de la app. El oferente bloquea, el cliente reserva. Sin intermediarios.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">2</div>
-                            <div>
-                                <h4 class="font-bold text-slate-900">Validación de Identidad</h4>
-                                <p class="text-sm text-slate-600">Registro con DUI obligatorio para garantizar seguridad en hogares.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">3</div>
-                            <div>
-                                <h4 class="font-bold text-slate-900">Sistema de Reseñas</h4>
-                                <p class="text-sm text-slate-600">Cierre de ciclo obligatorio. Sin calificación, no se completa el servicio.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right: Interactive Calendar Simulator -->
-                <div class="bg-slate-900 rounded-2xl p-6 shadow-2xl text-white transform rotate-1 hover:rotate-0 transition duration-500">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-lg">Simulador de Reserva (MVP)</h3>
-                        <span class="text-xs bg-green-500 text-white px-2 py-1 rounded">Live Demo</span>
-                    </div>
-                    
-                    <!-- Simulation Interface -->
-                    <div class="bg-white rounded-xl p-4 text-slate-900">
-                        <!-- Profile Header -->
-                        <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-4">
-                            <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-xl">👨‍🔧</div>
-                            <div>
-                                <div class="font-bold">Juan Pérez</div>
-                                <div class="text-xs text-slate-500">Fontanero Certificado • ⭐ 4.8</div>
-                            </div>
-                            <div class="ml-auto text-blue-600 font-bold">$15/h</div>
-                        </div>
-
-                        <!-- Calendar Grid -->
-                        <p class="text-xs text-slate-500 mb-2">Selecciona un horario disponible para HOY:</p>
-                        <div class="calendar-grid mb-4" id="sim-calendar">
-                            <!-- JS will populate this -->
-                        </div>
-
-                        <!-- Action Area -->
-                        <div id="booking-status" class="bg-slate-50 p-3 rounded-lg text-center text-sm text-slate-500 border border-slate-200">
-                            Selecciona una hora verde para reservar.
-                        </div>
-                        <button id="book-btn" disabled class="w-full mt-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2 rounded-lg transition shadow-md">
-                            Confirmar Reserva
-                        </button>
-                    </div>
-                    <p class="text-xs text-slate-400 mt-4 text-center">
-                        * Esta es la experiencia "Inmediatez Real". El usuario ve disponibilidad y actúa en segundos.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Roadmap Timeline -->
-        <section class="bg-slate-50 py-16 border-y border-slate-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-bold text-slate-900 mb-10 text-center">Roadmap de Ejecución</h2>
-                
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Phase 1 -->
-                    <div class="bg-white p-6 rounded-xl border-t-4 border-blue-500 shadow-sm hover-card">
-                        <div class="text-sm font-bold text-blue-500 mb-1">MESES 1-3</div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Fase 1: MVP Core</h3>
-                        <ul class="text-sm text-slate-600 space-y-2">
-                            <li>• Desarrollo de Calendario & Perfiles.</li>
-                            <li>• Chat básico interno.</li>
-                            <li>• Validación de registros.</li>
-                            <li>• Pruebas Alpha cerradas.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Phase 2 -->
-                    <div class="bg-white p-6 rounded-xl border-t-4 border-orange-500 shadow-sm hover-card">
-                        <div class="text-sm font-bold text-orange-500 mb-1">MESES 4-6</div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Fase 2: Lanzamiento Piloto</h3>
-                        <ul class="text-sm text-slate-600 space-y-2">
-                            <li>• Go-to-Market en zona piloto (ej. Santa Tecla).</li>
-                            <li>• Integración Pasarela de Pagos Local.</li>
-                            <li>• Campaña de Marketing "Inmediatez".</li>
-                        </ul>
-                    </div>
-
-                    <!-- Phase 3 -->
-                    <div class="bg-white p-6 rounded-xl border-t-4 border-emerald-500 shadow-sm hover-card">
-                        <div class="text-sm font-bold text-emerald-500 mb-1">MESES 7-12</div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Fase 3: Expansión & Gamificación</h3>
-                        <ul class="text-sm text-slate-600 space-y-2">
-                            <li>• Expansión a zonas aledañas.</li>
-                            <li>• Sistema de "Merch" para proveedores top.</li>
-                            <li>• Gamificación de perfiles.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 5: Strategic Analysis (SWOT) -->
-        <section id="strategy" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-8 text-center">Análisis Estratégico (FODA)</h2>
-            <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
-                Haz clic en cada cuadrante para revelar los detalles de nuestro posicionamiento estratégico.
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-                <!-- Strengths -->
-                <div class="bg-white p-6 rounded-xl border border-l-4 border-l-green-500 shadow-sm cursor-pointer hover:bg-green-50 transition group" onclick="toggleSwot(this)">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-bold text-lg text-slate-800">Fortalezas (Internas)</h3>
-                        <span class="text-green-500 text-xl group-hover:scale-110 transition">+</span>
-                    </div>
-                    <div class="swot-content hidden-content text-slate-600 text-sm mt-2 space-y-2 border-t pt-2 border-green-100">
-                        <p>• Tecnología propia (Next.js/React Native) superior a la competencia.</p>
-                        <p>• Enfoque único en inmediatez (Calendario).</p>
-                        <p>• Conocimiento profundo de la cultura local salvadoreña.</p>
-                    </div>
-                </div>
-
-                <!-- Weaknesses -->
-                <div class="bg-white p-6 rounded-xl border border-l-4 border-l-orange-500 shadow-sm cursor-pointer hover:bg-orange-50 transition group" onclick="toggleSwot(this)">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-bold text-lg text-slate-800">Debilidades (Internas)</h3>
-                        <span class="text-orange-500 text-xl group-hover:scale-110 transition">-</span>
-                    </div>
-                    <div class="swot-content hidden-content text-slate-600 text-sm mt-2 space-y-2 border-t pt-2 border-orange-100">
-                        <p>• Presupuesto de marketing inicial limitado.</p>
-                        <p>• Curva de aprendizaje para que el oferente use el calendario digital.</p>
-                    </div>
-                </div>
-
-                <!-- Opportunities -->
-                <div class="bg-white p-6 rounded-xl border border-l-4 border-l-blue-500 shadow-sm cursor-pointer hover:bg-blue-50 transition group" onclick="toggleSwot(this)">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-bold text-lg text-slate-800">Oportunidades (Externas)</h3>
-                        <span class="text-blue-500 text-xl group-hover:scale-110 transition">↗</span>
-                    </div>
-                    <div class="swot-content hidden-content text-slate-600 text-sm mt-2 space-y-2 border-t pt-2 border-blue-100">
-                        <p>• Ineficiencia técnica de competidores actuales (NomoApp).</p>
-                        <p>• Alta penetración de smartphones en sector informal.</p>
-                        <p>• Tendencia creciente hacia servicios "On-Demand".</p>
-                    </div>
-                </div>
-
-                <!-- Threats -->
-                <div class="bg-white p-6 rounded-xl border border-l-4 border-l-red-500 shadow-sm cursor-pointer hover:bg-red-50 transition group" onclick="toggleSwot(this)">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-bold text-lg text-slate-800">Amenazas (Externas)</h3>
-                        <span class="text-red-500 text-xl group-hover:scale-110 transition">!</span>
-                    </div>
-                    <div class="swot-content hidden-content text-slate-600 text-sm mt-2 space-y-2 border-t pt-2 border-red-100">
-                        <p>• Resistencia al cambio (preferencia por efectivo/tratos fuera de app).</p>
-                        <p>• Barreras de confianza iniciales por inseguridad del país.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 6: Business Model Simulator & Projections -->
-        <section id="business-model" class="bg-white py-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Modelo de Negocio y Proyecciones</h2>
-                    <p class="text-slate-600">Simulación financiera basada en los modelos de monetización propuestos.</p>
-                </div>
-
-                <div class="grid lg:grid-cols-3 gap-8">
-                    <!-- Calculator Panel -->
-                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                        <h3 class="font-bold text-lg text-slate-900 mb-4">Simulador de Ingresos</h3>
+                        <p class="text-sm text-orange-900/80 mb-6 font-medium">Fase 0: Reclutamiento B2B & Offline (Mes 1-2)</p>
                         
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Modelo de Cobro</label>
-                                <select id="model-select" class="w-full rounded-md border-slate-300 shadow-sm p-2 bg-white border">
-                                    <option value="commission">Comisión por Transacción (%)</option>
-                                    <option value="leads">Pago por Leads (Créditos)</option>
-                                </select>
-                            </div>
-
-                            <!-- Commission Inputs -->
-                            <div id="commission-inputs">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Comisión (%)</label>
-                                <input type="range" id="commission-slider" min="5" max="25" value="15" class="w-full accent-blue-600">
-                                <div class="text-right text-sm text-blue-600 font-bold" id="commission-display">15%</div>
-                            </div>
-                            
-                            <!-- Lead Inputs (Hidden by default) -->
-                            <div id="lead-inputs" class="hidden-content">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Costo por Lead ($)</label>
-                                <input type="number" id="lead-cost" value="1.50" step="0.50" class="w-full rounded-md border p-2">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Servicios Mensuales Estimados</label>
-                                <input type="number" id="services-count" value="500" class="w-full rounded-md border p-2">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Ticket Promedio ($)</label>
-                                <input type="number" id="ticket-avg" value="35" class="w-full rounded-md border p-2">
-                            </div>
-
-                            <button onclick="calculateRevenue()" class="w-full bg-slate-900 text-white font-bold py-2 rounded-lg hover:bg-slate-800 transition mt-2">
-                                Calcular Proyección
-                            </button>
-                        </div>
-
-                        <div class="mt-6 pt-6 border-t border-slate-200">
-                            <div class="flex justify-between items-end">
-                                <span class="text-sm text-slate-600">Ingreso Mensual Proyectado:</span>
-                                <span id="revenue-result" class="text-2xl font-bold text-green-600">$2,625</span>
-                            </div>
-                            <p class="text-xs text-slate-400 mt-2">GMV Estimado: <span id="gmv-result">$17,500</span></p>
-                        </div>
+                        <ul class="space-y-4 text-orange-900/90">
+                            <li class="flex items-start gap-3">
+                                <span class="mt-1">📍</span>
+                                <div>
+                                    <strong>Trabajo de Campo:</strong> Visitas a ferreterías clave (EPA, Freund, Vidrí) a primera hora de la mañana para reclutar fontaneros y electricistas "en la calle".
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="mt-1">🤝</span>
+                                <div>
+                                    <strong>Inducciones Físicas:</strong> No confían en lo 100% digital. Citar a grupos de 10 a oficinas para enseñar a usar la app, verificar DUI y crear perfiles con fotos profesionales gratis.
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="mt-1">🧢</span>
+                                <div>
+                                    <strong>Estrategia de Merch:</strong> Entregar gafete físico y camiseta a los primeros 50 verificados. Se convierten en embajadores de marca ambulantes.
+                                </div>
+                            </li>
+                        </ul>
                     </div>
 
-                    <!-- Charts Area -->
-                    <div class="lg:col-span-2 space-y-8">
-                        <div>
-                            <h4 class="font-bold text-slate-800 mb-2 text-center">Proyección de Crecimiento (12 Meses)</h4>
-                            <div class="chart-container">
-                                <canvas id="growthChart"></canvas>
-                            </div>
-                            <p class="text-xs text-center text-slate-500 mt-2">Basado en hoja de ruta Fase 1 a Fase 3 (Usuarios & Transacciones)</p>
+                    <!-- Demand Side (Demanda) -->
+                    <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-4xl">📱</span>
+                            <h3 class="text-2xl font-bold text-blue-800">2. La Demanda (Clientes)</h3>
                         </div>
+                        <p class="text-sm text-blue-900/80 mb-6 font-medium">Fase 1: Pauta Hiper-localizada (Mes 3+)</p>
+                        
+                        <ul class="space-y-4 text-blue-900/90">
+                            <li class="flex items-start gap-3">
+                                <span class="mt-1">🎯</span>
+                                <div>
+                                    <strong>Micro-Segmentación:</strong> Pauta en Meta Ads restringida a un radio de 5km (Ej. Santa Tecla / Antiguo Cuscatlán) para garantizar que los oferentes reclutados estén cerca.
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="mt-1">🚨</span>
+                                <div>
+                                    <strong>Mensaje de Urgencia:</strong> Creatividades enfocadas en el "dolor inmediato". <em>"¿Se rompió el tubo y tienes Zoom en 10 min? Encuentra fontanero aquí."</em>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="mt-1">⭐</span>
+                                <div>
+                                    <strong>Prueba Social:</strong> Usar los rostros y nombres reales de los trabajadores en los anuncios para combatir el miedo a "meter extraños a la casa".
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- KPI Section (Summary) -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">Métricas de Éxito (KPIs Core)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
-                    <div class="font-bold text-slate-800">Liquidez</div>
-                    <div class="text-xs text-slate-600">% Solicitudes completadas con éxito.</div>
+        <!-- Section 2: Marca y Mensaje -->
+        <section id="marca" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-8 text-center">Identidad de Marca y Storytelling</h2>
+            
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 hover-card text-center">
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="font-bold text-slate-800 mb-2">Dignificar el Oficio</h3>
+                    <p class="text-sm text-slate-600">El ángulo emocional. Contar historias reales de superación de nuestros oferentes en Instagram y TikTok. No vendemos "limpieza", vendemos "el esfuerzo de María".</p>
                 </div>
-                <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-600">
-                    <div class="font-bold text-slate-800">MAU</div>
-                    <div class="text-xs text-slate-600">Usuarios Activos Mensuales (Clientes/Oferentes).</div>
+                
+                <div class="bg-white p-6 rounded-xl border border-slate-200 hover-card text-center">
+                    <div class="text-4xl mb-4">⏱️</div>
+                    <h3 class="font-bold text-slate-800 mb-2">Inmediatez Real</h3>
+                    <p class="text-sm text-slate-600">El ángulo racional. Posicionarnos como la única app donde el "Calendario" manda. El slogan: <em>"Si está verde, está libre. Sin llamadas."</em></p>
                 </div>
-                <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-600">
-                    <div class="font-bold text-slate-800">Retención</div>
-                    <div class="text-xs text-slate-600">Re-contratación en 6 meses.</div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 hover-card text-center">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h3 class="font-bold text-slate-800 mb-2">Confianza Verificada</h3>
+                    <p class="text-sm text-slate-600">El ángulo de seguridad. Destacar en toda la pauta el "Badge" de verificación (DUI chequeado) para superar la barrera de confianza del salvadoreño.</p>
                 </div>
-                <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-600">
-                    <div class="font-bold text-slate-800">GMV</div>
-                    <div class="text-xs text-slate-600">Volumen Total de Mercancía.</div>
+            </div>
+        </section>
+
+        <!-- Section 3: Go To Market (Fases) -->
+        <section id="go-to-market" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 text-9xl opacity-5 transform translate-x-1/4 -translate-y-1/4">🚀</div>
+                <h2 class="text-3xl font-bold mb-8">El Piloto: Santa Tecla (Go-To-Market)</h2>
+                
+                <div class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-700 before:to-transparent">
+                    
+                    <!-- Item 1 -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-blue-500 bg-slate-900 text-blue-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 font-bold">1</div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-800 p-4 rounded border border-slate-700">
+                            <h4 class="font-bold text-blue-400 mb-1">Mapeo de Densidad</h4>
+                            <p class="text-sm text-slate-300">Seleccionar zonas con alta densidad de viviendas residenciales y oficinas pequeñas (Ej. Merliot, Escalón, Santa Tecla centro) donde el "DIY" (hazlo tú mismo) no es común.</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-orange-500 bg-slate-900 text-orange-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 font-bold">2</div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-800 p-4 rounded border border-slate-700">
+                            <h4 class="font-bold text-orange-400 mb-1">Campaña BTL y Alianzas</h4>
+                            <p class="text-sm text-slate-300">Alianzas con administraciones de colonias privadas para ser el "proveedor oficial verificado". Volanteo digital en grupos de WhatsApp residenciales.</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-green-500 bg-slate-900 text-green-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 font-bold">3</div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-800 p-4 rounded border border-slate-700">
+                            <h4 class="font-bold text-green-400 mb-1">Lanzamiento Digital (Ads)</h4>
+                            <p class="text-sm text-slate-300">Encendido de Meta Ads y Google Search Ads (Keywords: "Fontanero cerca", "Electricista de emergencia Santa Tecla"). Promoción de $5 de descuento en primer servicio.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Interactive Funnel & Budget Simulator -->
+        <section id="funnel" class="bg-white py-16 border-t border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Simulador de Embudo y CAC</h2>
+                    <p class="text-slate-600">Ajusta los valores para simular cuánto costará adquirir un cliente que pague (Costo de Adquisición de Cliente).</p>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-8">
+                    
+                    <!-- Controls Panel -->
+                    <div class="lg:col-span-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-900 mb-6">Variables de Pauta</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- Budget -->
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <label class="font-medium text-slate-700">Presupuesto Mensual Ads</label>
+                                    <span class="font-bold text-blue-600" id="val-budget">$500</span>
+                                </div>
+                                <input type="range" id="input-budget" min="100" max="2000" step="50" value="500">
+                            </div>
+
+                            <!-- CPC -->
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <label class="font-medium text-slate-700">Costo por Clic Estimado (CPC)</label>
+                                    <span class="font-bold text-blue-600" id="val-cpc">$0.25</span>
+                                </div>
+                                <input type="range" id="input-cpc" min="0.05" max="1.00" step="0.05" value="0.25">
+                            </div>
+
+                            <!-- Install Rate -->
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <label class="font-medium text-slate-700">Conversión: Clic a Registro</label>
+                                    <span class="font-bold text-blue-600" id="val-install">15%</span>
+                                </div>
+                                <input type="range" id="input-install" min="1" max="50" step="1" value="15">
+                            </div>
+
+                            <!-- Purchase Rate -->
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <label class="font-medium text-slate-700">Conversión: Registro a Reserva</label>
+                                    <span class="font-bold text-blue-600" id="val-purchase">20%</span>
+                                </div>
+                                <input type="range" id="input-purchase" min="1" max="50" step="1" value="20">
+                            </div>
+                        </div>
+
+                        <!-- Result Box -->
+                        <div class="mt-8 p-4 bg-blue-600 text-white rounded-xl text-center shadow-lg">
+                            <div class="text-sm text-blue-200 mb-1">Costo de Adquisición (CAC) Final</div>
+                            <div class="text-4xl font-black" id="result-cac">$8.33</div>
+                            <div class="text-xs text-blue-200 mt-2">Por cada cliente que completa 1 servicio.</div>
+                        </div>
+                    </div>
+
+                    <!-- Funnel Chart Area -->
+                    <div class="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                        <h4 class="font-bold text-slate-800 mb-6 text-center">Visualización del Embudo de Conversión</h4>
+                        <div class="chart-container">
+                            <canvas id="funnelChart"></canvas>
+                        </div>
+                        
+                        <!-- KPIs breakdown -->
+                        <div class="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-slate-100 text-center">
+                            <div>
+                                <div class="text-xl font-bold text-slate-700" id="kpi-clicks">2,000</div>
+                                <div class="text-xs text-slate-500 uppercase tracking-wide">Clics / Visitas</div>
+                            </div>
+                            <div>
+                                <div class="text-xl font-bold text-blue-600" id="kpi-users">300</div>
+                                <div class="text-xs text-blue-400 uppercase tracking-wide">Usuarios Registrados</div>
+                            </div>
+                            <div>
+                                <div class="text-xl font-bold text-green-600" id="kpi-clients">60</div>
+                                <div class="text-xs text-green-500 uppercase tracking-wide">Servicios Reservados</div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-8">
-            <div>
-                <h3 class="text-white text-xl font-bold mb-4">OficiosSV</h3>
-                <p class="text-sm mb-4">Dignificando el trabajo informal en El Salvador a través de tecnología accesible.</p>
-                <div class="flex gap-4">
-                    <span class="text-2xl">🇸🇻</span>
-                </div>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-4">Legal & Ops</h4>
-                <ul class="space-y-2 text-sm">
-                    <li>Sociedad por Acciones Simplificada (SAS)</li>
-                    <li>Registro CNR & Propiedad Intelectual</li>
-                    <li>Verificación KYC (DUI)</li>
-                    <li>Términos y Condiciones</li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-4">Próximos Pasos</h4>
-                <ul class="space-y-2 text-sm">
-                    <li>1. Reclutamiento B2B (Parques/Ferias)</li>
-                    <li>2. Desarrollo MVP (Next.js)</li>
-                    <li>3. Lanzamiento Piloto Santa Tecla</li>
-                </ul>
-            </div>
-        </div>
-        <div class="text-center mt-12 pt-8 border-t border-slate-800 text-xs">
-            © 2026 OficiosSV Proyecto Maestro. Generado para Análisis Estratégico.
+    <footer class="bg-slate-900 text-slate-400 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h3 class="text-white font-bold mb-2">OficiosSV Marketing</h3>
+            <p class="text-sm">Estrategia de crecimiento diseñada para alta retención y liquidez local.</p>
         </div>
     </footer>
 
-    <!-- Visualization & Content Choices:
-         1. Interactive Tabs (Audience): Chosen to declutter the UI and allow users to focus on one persona at a time, highlighting the "Two-sided Marketplace" complexity.
-         2. Calendar Simulator: A custom HTML/JS grid instead of a static image. Why? To prove the "No Calls" concept. Users need to FEEL the ease of clicking a green slot.
-         3. SWOT Accordion: Used to save space and gamify the reading of strategic risks.
-         4. Financial Calculator: Instead of static text saying "Commission vs Leads", a calculator lets the user play with the numbers, understanding the revenue potential dynamically.
-         5. Chart.js: Used for growth projections to visualize the Roadmap's impact over time.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <script>
-        // --- 1. AUDIENCE TABS LOGIC ---
-        function switchAudience(type) {
-            const clientContent = document.getElementById('content-client');
-            const providerContent = document.getElementById('content-provider');
-            const btnClient = document.getElementById('btn-client');
-            const btnProvider = document.getElementById('btn-provider');
-
-            if (type === 'client') {
-                clientContent.style.display = 'block';
-                providerContent.style.display = 'none';
-                
-                btnClient.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                btnClient.classList.remove('text-slate-500');
-                
-                btnProvider.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-                btnProvider.classList.add('text-slate-500');
-            } else {
-                clientContent.style.display = 'none';
-                providerContent.style.display = 'block';
-                
-                btnProvider.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                btnProvider.classList.remove('text-slate-500');
-                
-                btnClient.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-                btnClient.classList.add('text-slate-500');
-            }
-        }
-
-        // --- 2. CALENDAR SIMULATOR LOGIC ---
-        const calendarGrid = document.getElementById('sim-calendar');
-        const statusDiv = document.getElementById('booking-status');
-        const bookBtn = document.getElementById('book-btn');
-        let selectedSlot = null;
-
-        // Generate Time Slots (8:00 AM to 5:00 PM)
-        const times = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
-        // Randomly block some slots to simulate reality
-        const blockedIndices = [1, 4, 5]; 
-
-        times.forEach((time, index) => {
-            const slot = document.createElement('div');
-            slot.className = 'time-slot border rounded p-2 text-center text-xs font-medium';
-            slot.textContent = time;
-
-            if (blockedIndices.includes(index)) {
-                slot.classList.add('blocked');
-                slot.title = 'Ocupado';
-            } else {
-                slot.classList.add('bg-green-50', 'text-green-700', 'border-green-200', 'hover:bg-green-100');
-                slot.onclick = () => selectSlot(slot, time);
-            }
-            calendarGrid.appendChild(slot);
-        });
-
-        function selectSlot(element, time) {
-            // Clear previous selection
-            document.querySelectorAll('.time-slot').forEach(el => {
-                if (!el.classList.contains('blocked')) {
-                    el.classList.remove('selected', 'bg-blue-600', 'text-white', 'border-blue-600');
-                    el.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
-                }
-            });
-
-            // Set new selection
-            element.classList.remove('bg-green-50', 'text-green-700', 'border-green-200');
-            element.classList.add('selected', 'bg-blue-600', 'text-white', 'border-blue-600');
-            
-            selectedSlot = time;
-            statusDiv.innerHTML = `Horario seleccionado: <strong>Hoy a las ${time}</strong>`;
-            statusDiv.classList.add('text-blue-600', 'bg-blue-50');
-            statusDiv.classList.remove('text-slate-500');
-            bookBtn.disabled = false;
-            bookBtn.textContent = "Confirmar Reserva";
-            bookBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-            bookBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-        }
-
-        bookBtn.onclick = () => {
-            bookBtn.textContent = "¡Solicitud Enviada!";
-            bookBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            bookBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-            statusDiv.innerHTML = "✅ El fontanero ha recibido tu solicitud.";
-            setTimeout(() => {
-                bookBtn.disabled = true;
-            }, 500);
+        // --- FUNNEL SIMULATOR LOGIC ---
+        const formatMoney = (val) => '$' + parseFloat(val).toFixed(2);
+        
+        // DOM Elements
+        const inputs = {
+            budget: document.getElementById('input-budget'),
+            cpc: document.getElementById('input-cpc'),
+            install: document.getElementById('input-install'),
+            purchase: document.getElementById('input-purchase')
+        };
+        
+        const displays = {
+            budget: document.getElementById('val-budget'),
+            cpc: document.getElementById('val-cpc'),
+            install: document.getElementById('val-install'),
+            purchase: document.getElementById('val-purchase'),
+            cac: document.getElementById('result-cac'),
+            clicks: document.getElementById('kpi-clicks'),
+            users: document.getElementById('kpi-users'),
+            clients: document.getElementById('kpi-clients')
         };
 
-        // --- 3. SWOT TOGGLE LOGIC ---
-        function toggleSwot(element) {
-            const content = element.querySelector('.swot-content');
-            const isHidden = content.classList.contains('hidden-content');
-            
-            // Close all others first (Accordion style)
-            document.querySelectorAll('.swot-content').forEach(el => el.classList.add('hidden-content'));
-            
-            if (isHidden) {
-                content.classList.remove('hidden-content');
-                content.classList.add('animate-fadeIn');
-            }
-        }
-
-        // --- 4. BUSINESS MODEL CALCULATOR ---
-        const modelSelect = document.getElementById('model-select');
-        const commInputs = document.getElementById('commission-inputs');
-        const leadInputs = document.getElementById('lead-inputs');
-        const slider = document.getElementById('commission-slider');
-        const display = document.getElementById('commission-display');
-
-        modelSelect.onchange = () => {
-            if (modelSelect.value === 'commission') {
-                commInputs.classList.remove('hidden-content');
-                leadInputs.classList.add('hidden-content');
-            } else {
-                commInputs.classList.add('hidden-content');
-                leadInputs.classList.remove('hidden-content');
-            }
-            calculateRevenue();
-        };
-
-        slider.oninput = () => {
-            display.textContent = slider.value + "%";
-            calculateRevenue();
-        };
-
-        function calculateRevenue() {
-            const services = parseInt(document.getElementById('services-count').value) || 0;
-            const ticket = parseFloat(document.getElementById('ticket-avg').value) || 0;
-            const gmv = services * ticket;
-            
-            let revenue = 0;
-
-            if (modelSelect.value === 'commission') {
-                const percent = parseInt(slider.value) / 100;
-                revenue = gmv * percent;
-            } else {
-                // Lead Model assumption: 2.5 leads bought per completed service on average
-                const leadCost = parseFloat(document.getElementById('lead-cost').value) || 0;
-                const leadsPerService = 2.5; 
-                revenue = services * leadsPerService * leadCost;
-            }
-
-            // Animation for numbers
-            animateValue(document.getElementById('revenue-result'), revenue);
-            document.getElementById('gmv-result').textContent = formatMoney(gmv);
-            
-            // Update Chart Data based on new revenue
-            updateChart(revenue);
-        }
-
-        function formatMoney(amount) {
-            return '$' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
-
-        function animateValue(obj, end) {
-            let startTimestamp = null;
-            const duration = 500;
-            const start = parseFloat(obj.textContent.replace(/[^0-9.-]+/g,"")) || 0;
-            
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.textContent = formatMoney(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        // --- 5. CHART.JS IMPLEMENTATION ---
-        let growthChartInstance = null;
+        let funnelChartInstance = null;
 
         function initChart() {
-            const ctx = document.getElementById('growthChart').getContext('2d');
+            const ctx = document.getElementById('funnelChart').getContext('2d');
             
-            // Initial Data (Months 1-12) based on Roadmap Phases
-            // Phase 1 (1-3): Slow growth (Dev/Alpha)
-            // Phase 2 (4-6): Pilot Launch (Spike)
-            // Phase 3 (7-12): Expansion (Linear Growth)
-            
-            const months = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'];
-            
-            growthChartInstance = new Chart(ctx, {
-                type: 'line',
+            funnelChartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'GMV Proyectado ($)',
-                            data: [0, 0, 1000, 5000, 8000, 12000, 18000, 25000, 35000, 48000, 65000, 85000], // Conceptual Growth Curve
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Usuarios Activos (MAU)',
-                            data: [10, 20, 50, 150, 300, 450, 600, 800, 1100, 1500, 2000, 2800],
-                            borderColor: '#f97316',
-                            backgroundColor: 'rgba(249, 115, 22, 0.0)',
-                            borderDash: [5, 5],
-                            tension: 0.4,
-                            yAxisID: 'y1'
-                        }
-                    ]
+                    labels: ['Visitas (Top Funnel)', 'Registros (Mid Funnel)', 'Reservas (Bottom Funnel)'],
+                    datasets: [{
+                        label: 'Volumen de Usuarios',
+                        data: [2000, 300, 60],
+                        backgroundColor: [
+                            'rgba(148, 163, 184, 0.8)', // Slate
+                            'rgba(59, 130, 246, 0.8)',  // Blue
+                            'rgba(34, 197, 94, 0.8)'    // Green
+                        ],
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                    indexAxis: 'y', // Makes it a horizontal bar chart (acts like a funnel)
                     plugins: {
-                        legend: {
-                            position: 'top',
-                        },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        if (context.datasetIndex === 0) {
-                                            label += formatMoney(context.parsed.y);
-                                        } else {
-                                            label += context.parsed.y;
-                                        }
-                                    }
-                                    return label;
-                                }
+                                label: (context) => context.raw.toLocaleString() + ' Personas'
                             }
                         }
                     },
                     scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: { display: true, text: 'GMV ($)' }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                            title: { display: true, text: 'Usuarios' }
-                        },
+                        x: { beginAtZero: true, display: false }, // Hide grid lines for cleaner look
+                        y: { 
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold' } }
+                        }
                     }
                 }
             });
         }
 
-        function updateChart(monthlyRevenue) {
-            // Adjust the GMV curve based on the calculator's current monthly projection snapshot
-            if(!growthChartInstance) return;
-            
-            // Simple heuristic: Scale the curve based on the "Month 12" simulated revenue
-            // We assume the calculator output is the target for Month 6 (Pilot maturity) for this visual
-            
-            const currentData = growthChartInstance.data.datasets[0].data;
-            const scaleFactor = monthlyRevenue / 300; // Arbitrary scaling for visual effect
-            
-            // Re-calculate mock data to make the chart look dynamic
-            const newData = currentData.map((val, index) => {
-                 // Base curve shape * scale factor derived from inputs
-                 return Math.round((index * index * 100) * (monthlyRevenue / 10000) + (monthlyRevenue * 0.1 * index)); 
-            });
+        function calculateFunnel() {
+            // Get values
+            const budget = parseFloat(inputs.budget.value);
+            const cpc = parseFloat(inputs.cpc.value);
+            const installRate = parseFloat(inputs.install.value) / 100;
+            const purchaseRate = parseFloat(inputs.purchase.value) / 100;
 
-            growthChartInstance.data.datasets[0].data = newData;
-            growthChartInstance.update();
+            // Update display labels
+            displays.budget.textContent = formatMoney(budget);
+            displays.cpc.textContent = formatMoney(cpc);
+            displays.install.textContent = (installRate * 100).toFixed(0) + '%';
+            displays.purchase.textContent = (purchaseRate * 100).toFixed(0) + '%';
+
+            // Calculate metrics
+            const clicks = Math.round(budget / cpc);
+            const users = Math.round(clicks * installRate);
+            const clients = Math.round(users * purchaseRate);
+            
+            // Handle divide by zero or extreme cases gracefully
+            const cac = clients > 0 ? (budget / clients) : 0;
+
+            // Update UI
+            displays.cac.textContent = formatMoney(cac);
+            displays.clicks.textContent = clicks.toLocaleString();
+            displays.users.textContent = users.toLocaleString();
+            displays.clients.textContent = clients.toLocaleString();
+
+            // Update Chart
+            if(funnelChartInstance) {
+                funnelChartInstance.data.datasets[0].data = [clicks, users, clients];
+                funnelChartInstance.update();
+            }
         }
 
-        // Initialize
+        // Attach event listeners to sliders
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calculateFunnel);
+        });
+
+        // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             initChart();
-            calculateRevenue(); // Run initial calc
-            
-            // Mobile Menu Toggle
-            document.getElementById('mobile-menu-btn').onclick = () => {
-                const menu = document.getElementById('mobile-menu');
-                menu.classList.toggle('hidden');
-            };
+            calculateFunnel();
         });
 
     </script>
